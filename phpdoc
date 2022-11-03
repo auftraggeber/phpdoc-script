@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Script um eine PHP-Dokumentation zu erstellen
+
+function nav () {
+    if [ "$1" != "" ]; then
+        cd "$1"
+        clear
+    fi
+
+    local current_dir=$( pwd )
+    echo "Sie befinden sich im Verzeichnis $current_dir"
+
+    local file_list=$( ls -d */ )
+    echo "Die Dateien in diesem Verzeichnis sind:"
+    echo $file_list
+    echo
+
+    read -p "Wo möchten Sie hin navigieren? Leer lassen um zu bestätigen. " cd_dir
+
+    echo $cd_dir
+
+    if [ "$cd_dir" == "" ]; then
+        echo "Sie haben bestätigt."
+        deleteOldPhpDoc
+        generateNewPhpDoc
+    else
+        nav $cd_dir
+    fi
+}
+
+function deleteOldPhpDoc() {
+    echo "Alte PHP-Dokumentation wird gelöscht."
+    rm -rf .phpdoc/
+    echo "Alte PHP-Dokumentation wurde gelöscht."
+}
+
+function generateNewPhpDoc() {
+    echo "Neue PHP-Dokumentation wird erstellt."
+    docker run --rm -v "$(pwd):/data" "phpdoc/phpdoc:3"
+    echo "Neue PHP-Dokumentation wurde erstellt."
+}
+
+nav ""
